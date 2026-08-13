@@ -1,9 +1,9 @@
-import { useUser } from "@clerk/react"
+import { useAuthStore } from "@/stores/authStore"
 // import { FileExclamationPoint } from "lucide-react"
 
 export function Dashboard() {
   // const { user, isLoaded, isSignedIn } = useUser()
-  const { user } = useUser()
+  const user = useAuthStore((state) => state.user)
 
   // if (!isLoaded) {
   //   return (
@@ -28,7 +28,7 @@ export function Dashboard() {
     <div className="min-h-screen bg-gray-50 px-6 pt-28">
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-semibold text-gray-900">
-          Welcome, {user?.firstName || "User"}!
+          Welcome, {user?.displayName || "User"}!
         </h1>
         <p className="mt-2 text-gray-600">
           This is your dashboard where you can manage your properties, view your

@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/react"
+import { useAuthStore } from "@/stores/authStore"
 import { useQueries } from "@tanstack/react-query"
 import { Building2, House, TrendingUp } from "lucide-react"
 import { type ReactNode, useMemo } from "react"
@@ -6,6 +6,7 @@ import { fetchPropertyDetail } from "@/api/properties"
 import { useProperties } from "@/hooks/useProperties"
 
 function formatTodayLong(): string {
+
   return new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
@@ -60,13 +61,9 @@ function StatCard({
 }
 
 export function AdminDashboard() {
-  const { user } = useUser()
-  const displayName =
-    user?.firstName ??
-    user?.fullName ??
-    user?.username ??
-    user?.primaryEmailAddress?.emailAddress ??
-    "there"
+  const user = useAuthStore((state) => state.user)
+  const displayName = user?.displayName || user?.email || "there"
+
 
   const {
     data: properties,
@@ -99,9 +96,9 @@ export function AdminDashboard() {
       : roomsLoading
         ? null
         : detailQueries.reduce(
-            (sum, q) => sum + (q.data?.rooms?.length ?? 0),
-            0,
-          )
+          (sum, q) => sum + (q.data?.rooms?.length ?? 0),
+          0,
+        )
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 pt-28 pb-16">

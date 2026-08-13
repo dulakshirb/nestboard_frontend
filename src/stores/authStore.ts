@@ -10,7 +10,7 @@ type AuthState = {
   user: User | null
   status: AuthStatus
   hydrate: () => Promise<void>
-  signIn: (email: string, password: string) => Promise<void>
+  signIn: (email: string, password: string) => Promise<User>
   signOut: () => void
 }
 
@@ -38,6 +38,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.setItem(REFRESH_KEY, res.refreshToken)
     const user = await fetchMe()
     set({ user, status: "signedIn" })
+    return user
   },
 
   signOut: () => {

@@ -1,15 +1,16 @@
-import { useUser } from "@clerk/react"
 import { Navigate } from "react-router"
 import type { ReactNode } from "react"
+import { useAuthStore } from "@/stores/authStore"
 
 type AdminProtectedRouteProps = {
   children: ReactNode
 }
 
 export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
-  const { user, isLoaded, isSignedIn } = useUser()
+  const status = useAuthStore((state) => state.status)
+  const role = useAuthStore((state) => state.user?.role)
 
-  if (!isLoaded) {
+  if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-gray-500">Loading...</p>
@@ -17,13 +18,11 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
     )
   }
 
-  if (!isSignedIn) {
+  if (status !== "signedIn") {
     return <Navigate to="/sign-in" replace />
   }
 
-  const role = user?.publicMetadata?.role as string | undefined
-
-  if (role !== "admin") {
+  if (role !== "ADMIN") {
     return <Navigate to="/dashboard" replace />
   }
 
