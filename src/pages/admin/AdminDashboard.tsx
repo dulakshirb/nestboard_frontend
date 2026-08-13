@@ -2,7 +2,7 @@ import { useAuthStore } from "@/stores/authStore"
 import { useQueries } from "@tanstack/react-query"
 import { Building2, House, TrendingUp } from "lucide-react"
 import { type ReactNode, useMemo } from "react"
-import { fetchPropertyDetail } from "@/api/properties"
+import { fetchRoomTypes } from "@/api/properties"
 import { useProperties } from "@/hooks/useProperties"
 
 function formatTodayLong(): string {
@@ -78,7 +78,7 @@ export function AdminDashboard() {
   const detailQueries = useQueries({
     queries: propertyIds.map((id) => ({
       queryKey: ["property-detail", id],
-      queryFn: () => fetchPropertyDetail(id),
+      queryFn: () => fetchRoomTypes(id),
       enabled: propertyIds.length > 0,
       staleTime: 60_000,
     })),
@@ -96,7 +96,7 @@ export function AdminDashboard() {
       : roomsLoading
         ? null
         : detailQueries.reduce(
-          (sum, q) => sum + (q.data?.rooms?.length ?? 0),
+          (sum, q) => sum + (q.data?.length ?? 0),
           0,
         )
 

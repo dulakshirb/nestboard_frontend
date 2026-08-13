@@ -5,5 +5,6 @@ export function useProperties() {
   return useQuery({
     queryKey: ["properties"],
     queryFn: fetchProperties,
+    select: (res) => res.data,
   })
 }

@@ -3,11 +3,12 @@ import { PropertySection } from "./components/PropertySection"
 import { PropertyInfo } from "./components/PropertyInfo"
 import { RoomList } from "./components/RoomList"
 import { usePropertyDetail } from "@/hooks/usePropertyDetail"
+import { useRoomTypes } from "@/hooks/useRoomTypes"
 
 export function PropertyDetails() {
   const { id } = useParams<{ id: string }>()
-  // const property = propertyDetails.find((p) => p.id === id)
   const { data: property, isLoading, isError } = usePropertyDetail(id)
+  const { data: roomTypes, isLoading: roomTypesLoading } = useRoomTypes(id)
 
   if (isLoading) {
     return (
@@ -30,7 +31,10 @@ export function PropertyDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PropertySection image={property.image} rating={property.rating} />
+      <PropertySection
+        image={property.imageUrl}
+        rating={Number(property.rating)}
+      />
 
       <div className="px-4 pb-12">
         <div className="relative z-10 -mt-12">
@@ -38,14 +42,18 @@ export function PropertyDetails() {
             title={property.title}
             address={property.address}
             amenities={property.amenities}
-            seatsAvailable={property.seatsAvailable}
+            seatsAvailable={property.available_seats}
             minStay={property.minStay}
-            startingPrice={property.startingPrice}
+            startingPrice={property.cost}
           />
         </div>
 
         <div className="mt-5">
-          <RoomList rooms={property.rooms} />
+          <RoomList
+            rooms={roomTypes ?? []}
+            loading={roomTypesLoading}
+            propertyId={property.id}
+          />
         </div>
       </div>
     </div>
