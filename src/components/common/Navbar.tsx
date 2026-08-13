@@ -1,4 +1,5 @@
-import { Building2, Heart, LogOut, MessageCircle } from "lucide-react"
+import { Building2, Heart, LogOut, Menu, MessageCircle, X } from "lucide-react"
+import { useState } from "react"
 import { NavLink, useNavigate } from "react-router"
 import { useAuthStore } from "@/stores/authStore"
 
@@ -22,11 +23,24 @@ function initials(name: string): string {
 
 export function Navbar({ links }: NavbarProps) {
   const navigate = useNavigate()
+  const [open, setOpen] = useState(false)
   const user = useAuthStore((state) => state.user)
   const status = useAuthStore((state) => state.status)
   const signOut = useAuthStore((state) => state.signOut)
   const isSignedIn = status === "signedIn"
   const isAdmin = user?.role === "ADMIN"
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    [
+      "text-md rounded-full px-4 py-1.5 transition-all duration-200",
+      isActive
+        ? "bg-primary text-white"
+        : "text-white/70 hover:bg-white/10 hover:text-white",
+    ].join(" ")
+
+  function closeMenu() {
+    setOpen(false)
+  }
 
   return (
     <div className="absolute top-0 right-0 left-0 z-50 px-4 pt-4">
@@ -35,7 +49,7 @@ export function Navbar({ links }: NavbarProps) {
           }`}
       >
         {/* Logo */}
-        <NavLink to="/">
+        <NavLink to="/" onClick={closeMenu}>
           <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
               <Building2 className="h-5 w-5 text-white" />
@@ -44,44 +58,26 @@ export function Navbar({ links }: NavbarProps) {
           </div>
         </NavLink>
 
-        {/* Nav links */}
-        <div className="flex items-center gap-1">
+        {/* Desktop links */}
+        <div className="hidden items-center gap-1 md:flex">
           {links.map(({ label, to }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                [
-                  "text-md rounded-full px-4 py-1.5 transition-all duration-200",
-                  isActive
-                    ? "bg-primary text-white"
-                    : "text-white/70 hover:bg-white/10 hover:text-white",
-                ].join(" ")
-              }
-            >
+            <NavLink key={to} to={to} className={linkClass}>
               {label}
             </NavLink>
           ))}
           {isAdmin && (
-            <NavLink
-              to="/admin"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-md font-regular rounded-full bg-primary px-4 py-1.5 text-white"
-                  : "text-md font-regular px-4 py-1.5 text-white/70 transition-colors hover:text-white"
-              }
-            >
+            <NavLink to="/admin" className={linkClass}>
               Admin
             </NavLink>
           )}
         </div>
 
         {/* Right section */}
-        <div className="flex items-center gap-3.5">
-          <button className="rounded-full p-2 transition-colors hover:bg-white/10">
+        <div className="flex items-center gap-2 sm:gap-3.5">
+          <button className="hidden rounded-full p-2 transition-colors hover:bg-white/10 sm:block">
             <Heart className="h-5 w-5 text-white/70 hover:text-white" />
           </button>
-          <button className="rounded-full p-2 transition-colors hover:bg-white/10">
+          <button className="hidden rounded-full p-2 transition-colors hover:bg-white/10 sm:block">
             <MessageCircle className="h-5 w-5 text-white/70 hover:text-white" />
           </button>
 
@@ -110,8 +106,60 @@ export function Navbar({ links }: NavbarProps) {
               </button>
             </>
           )}
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setOpen((v) => !v)}
+            title="Menu"
+            className="rounded-full p-2 transition-colors hover:bg-white/10 md:hidden"
+          >
+            {open ? (
+              <X className="h-5 w-5 text-white" />
+            ) : (
+              <Menu className="h-5 w-5 text-white" />
+            )}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="mt-2 rounded-2xl bg-white p-2 shadow-lg md:hidden">
+          {links.map(({ label, to }) => (
+            <NavLink
+              key={to}
+              to={to}
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                [
+                  "block rounded-xl px-4 py-2.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-700 hover:bg-gray-50",
+                ].join(" ")
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                [
+                  "block rounded-xl px-4 py-2.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-700 hover:bg-gray-50",
+                ].join(" ")
+              }
+            >
+              Admin
+            </NavLink>
+          )}
+        </div>
+      )}
     </div>
   )
 }

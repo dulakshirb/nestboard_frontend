@@ -92,7 +92,7 @@ export function MyBookings() {
                 </Badge>
               </div>
 
-              <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-500">
+              <div className="mt-3 grid grid-cols-1 gap-1 text-xs text-gray-500 sm:grid-cols-3 sm:gap-2">
                 <span>
                   {formatDate(booking.leaseStart)} –{" "}
                   {formatDate(booking.leaseEnd)}

@@ -21,7 +21,7 @@ export function PropertyInfo({
 }: PropertyInfoProps) {
   return (
     <Card className="relative z-10 gap-0 rounded-3xl p-6 shadow-xl ring-0">
-      <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+      <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">{title}</h1>
 
       <div className="mt-1.5 flex items-center gap-1.5 text-gray-400">
         <MapPin className="size-3.5 shrink-0" />

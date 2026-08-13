@@ -46,7 +46,7 @@ export function SearchFilters() {
   const setActiveCategory = useUIStore((state) => state.setActiveCategory)
   return (
     <div className="relative z-20 -mt-7 px-4">
-      <div className="rounded-2xl bg-white p-8 shadow-xl">
+      <div className="rounded-2xl bg-white p-5 shadow-xl sm:p-8">
         {/* Search row */}
         <div className="mb-3 flex gap-2">
           <div className="relative flex-1">
@@ -67,7 +67,7 @@ export function SearchFilters() {
           </Button>
         </div>
         {/* Category tabs */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {categories.map(({ label, icon: Icon }) => (
             <Button
               key={label}

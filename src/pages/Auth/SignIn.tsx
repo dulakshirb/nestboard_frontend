@@ -37,7 +37,7 @@ export function SignIn() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-sm"
+        className=" w-full max-w-sm rounded-2xl bg-white px-5 py-8 shadow-sm sm:p-8"
       >
         <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
         <p className="mt-1 text-sm text-gray-500">
