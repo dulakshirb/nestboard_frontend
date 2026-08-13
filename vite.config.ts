@@ -24,6 +24,9 @@ export default defineConfig({
   },
   server: {
     port: 5183,
+    proxy: {
+      "/api": "http://localhost:3001",
+    },
   },
   build: {
     target: "esnext",
