@@ -60,7 +60,7 @@ export function AdminBookings() {
       </div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
-        <table className="w-full min-w-[820px] text-left text-sm">
+        <table className="w-full min-w-205 text-left text-sm">
           <thead>
             <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-400 uppercase">
               <th className="px-5 py-3.5 font-medium">Booking ID</th>

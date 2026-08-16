@@ -136,6 +136,7 @@ export function AdminDashboard() {
         const seats = rts.reduce((s, rt) => s + rt.seatCapacity, 0)
         const free = rts.reduce((s, rt) => s + rt.freeSeats, 0)
         return {
+          id,
           title: properties?.find((p) => p.id === id)?.title ?? "-",
           occ: seats > 0 ? Math.round(((seats - free) / seats) * 100) : 0,
         }
@@ -199,7 +200,7 @@ export function AdminDashboard() {
               </p>
             ) : (
               perProperty.map((p) => (
-                <div key={p.title}>
+                <div key={p.id}>
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-gray-800">{p.title}</span>
                     <span className="font-semibold text-gray-900">{p.occ}%</span>
