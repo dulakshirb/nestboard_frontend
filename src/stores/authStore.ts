@@ -12,6 +12,7 @@ type AuthState = {
   hydrate: () => Promise<void>
   signIn: (email: string, password: string) => Promise<User>
   signOut: () => void
+  setUser: (user: User | null) => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -45,4 +46,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     clearTokens()
     set({ user: null, status: "signedOut" })
   },
+
+  setUser: (user) => set({ user }),
 }))

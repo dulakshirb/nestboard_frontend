@@ -15,12 +15,16 @@ import { AdminDashboard } from "./pages/admin/AdminDashboard"
 import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute"
 import { AdminThemeApplier } from "./components/auth/AdminThemeApplier"
 import { useAuthStore } from "@/stores/authStore"
+import { AdminLayout } from "./pages/admin/AdminLayout"
+import { AdminBookings } from "./pages/admin/AdminBookings"
+import { AdminProperties } from "./pages/admin/AdminProperties"
+import { AdminProfile } from "./pages/admin/AdminProfile"
 
 const navLinks: NavbarLink[] = [
   { label: "Explore", to: "/" },
   { label: "Map View", to: "/map" },
-  { label: "Bookings", to: "/bookings" },
-  { label: "Dashboard", to: "/dashboard" },
+  // { label: "Bookings", to: "/bookings" },
+  // { label: "Dashboard", to: "/dashboard" },
 ]
 
 function AppLayout() {
@@ -85,12 +89,17 @@ export function App() {
                 path="/admin"
                 element={
                   <AdminProtectedRoute>
-                    <AdminDashboard />
+                    <AdminLayout />
                   </AdminProtectedRoute>
                 }
-              />
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="bookings" element={<AdminBookings />} />
+                <Route path="properties" element={<AdminProperties />} />
+                <Route path="profile" element={<AdminProfile />} />
+              </Route>
+              <Route path="/sign-in/*" element={<SignIn />} />
             </Route>
-            <Route path="/sign-in/*" element={<SignIn />} />
           </Routes>
           <ReactQueryDevtools initialIsOpen={false} />
         </AdminThemeApplier>

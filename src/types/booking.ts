@@ -35,3 +35,12 @@ export type CreateBookingInput = {
   startMonth: string
   durationMonths: number
 }
+
+export type AdminBooking = Booking & {
+  tenant: {
+    id: string
+    displayName: string
+    email: string
+    avatarUrl: string | null
+  }
+}

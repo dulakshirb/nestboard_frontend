@@ -7,6 +7,7 @@ export type Property = {
   price: string
   rating: number
   isFavorite: boolean
+  isActive: boolean
   image: string
 }
 
@@ -72,4 +73,17 @@ export type RoomTypeDetail = {
   roomsCount: number
   hasAC: boolean
   rooms: RoomSeats[]
+}
+
+export type CreatePropertyInput = {
+  title: string
+  description: string
+  address: string
+  city: string
+  type: "HOUSE" | "VILLA" | "APARTMENT" | "HOTEL"
+  amenities: string[]
+  latitude: number
+  longitude: number
+  imageUrl: string
+  minStay?: string
 }

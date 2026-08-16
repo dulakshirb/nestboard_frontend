@@ -1,5 +1,6 @@
 import { api } from "./client"
 import type {
+  CreatePropertyInput,
   Property,
   PropertyDetail,
   PropertyListResponse,
@@ -24,4 +25,19 @@ export function fetchRoomTypeDetail(
   roomTypeId: string,
 ): Promise<RoomTypeDetail> {
   return api<RoomTypeDetail>(`/properties/${id}/room-types/${roomTypeId}`)
+}
+
+export function fetchMyProperties(): Promise<Property[]> {
+  return api<Property[]>("/properties/mine")
+}
+
+export function createProperty(input: CreatePropertyInput): Promise<unknown> {
+  return api("/properties", { method: "POST", body: input })
+}
+
+export function setPropertyActive(
+  id: string,
+  isActive: boolean,
+): Promise<unknown> {
+  return api(`/properties/${id}`, { method: "PATCH", body: { isActive } })
 }
