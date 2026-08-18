@@ -3,7 +3,6 @@ import { useQueries } from "@tanstack/react-query"
 import { type ReactNode, useMemo } from "react"
 import { fetchRoomTypes } from "@/api/properties"
 
-import { useAuthStore } from "@/stores/authStore"
 import { useMyProperties } from "@/hooks/useMyProperties"
 import { useAdminBookings } from "@/hooks/useAdminBookings"
 
@@ -61,7 +60,6 @@ function StatCard({
 }
 
 export function AdminDashboard() {
-  const user = useAuthStore((state) => state.user)
   const { data: properties, isLoading: propsLoading } = useMyProperties()
   const { data: bookings, isLoading: bookingsLoading } = useAdminBookings()
 
@@ -94,24 +92,6 @@ export function AdminDashboard() {
           (sum, q) => sum + (q.data?.reduce((s, rt) => s + rt.roomsCount, 0) ?? 0),
           0,
         )
-
-  const totalSeats = useMemo(
-    () =>
-      roomTypeQueries.reduce(
-        (sum, q) => sum + (q.data?.reduce((s, rt) => s + rt.seatCapacity, 0) ?? 0),
-        0,
-      ),
-    [roomTypeQueries],
-  )
-  const freeSeats = useMemo(
-    () =>
-      roomTypeQueries.reduce(
-        (sum, q) => sum + (q.data?.reduce((s, rt) => s + rt.freeSeats, 0) ?? 0),
-        0,
-      ),
-    [roomTypeQueries],
-  )
-  const occupancy = totalSeats > 0 ? Math.round(((totalSeats - freeSeats) / totalSeats) * 100) : 0
 
   const activeBookings = useMemo(
     () => (bookings ?? []).filter((b) => b.bookingStatus === "CONFIRMED").length,

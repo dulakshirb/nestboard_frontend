@@ -10,7 +10,6 @@ import {
   Phone,
   Save,
   Lock,
-  Shield,
   Bell,
   CreditCard,
   Globe,
@@ -73,14 +72,14 @@ function SectionCard({
 
 function FieldLabel({
   children,
-  icon,
+  icon: Icon,
 }: {
   children: React.ReactNode
   icon?: React.ComponentType<{ className?: string }>
 }) {
   return (
     <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-600">
-      {icon && <icon className="size-4 text-gray-500" />}
+      {Icon && <Icon className="size-4 text-gray-500" />}
       {children}
     </label>
   )
@@ -96,9 +95,7 @@ export function Settings() {
   const [phone, setPhone] = useState("")
 
   const [currentPassword, setCurrentPassword] = useState("")
-  const [newPassword, setNewPassword] = useState("")
   const [showCurrentPw, setShowCurrentPw] = useState(false)
-  const [showNewPw, setShowNewPw] = useState(false)
 
   const [emailNotifications, setEmailNotifications] = useState(true)
   const [smsNotifications, setSmsNotifications] = useState(false)
@@ -408,7 +405,7 @@ export function Settings() {
                 { label: "Contact Support", icon: MessageCircle },
                 { label: "Terms of Service", icon: FileText },
                 { label: "Privacy Policy", icon: FileText },
-              ].map(({ label, icon: ItemIcon }) => (
+              ].map(({ label }) => (
                 <button
                   key={label}
                   type="button"

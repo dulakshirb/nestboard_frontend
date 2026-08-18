@@ -1,11 +1,9 @@
 import {
   Search,
-  SlidersHorizontal,
   Home,
   Building2,
   Warehouse,
   Hotel,
-  ArrowUpDown,
   MapPin,
   type LucideIcon,
 } from "lucide-react"

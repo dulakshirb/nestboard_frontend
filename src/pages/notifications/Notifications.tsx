@@ -5,8 +5,8 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/api/notifications"
-import { Bell, CheckCheck, Home, CalendarCheck, XCircle, Clock } from "lucide-react"
-import type { Notification, NotificationType } from "@/types/notification"
+import { Bell, CheckCheck, CalendarCheck, XCircle, Clock } from "lucide-react"
+import type { NotificationType } from "@/types/notification"
 
 const TYPE_CONFIG: Record<
   NotificationType,

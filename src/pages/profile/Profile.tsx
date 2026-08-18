@@ -8,7 +8,6 @@ import { Link, useNavigate } from "react-router"
 import {
   Camera,
   Mail,
-  MapPin,
   Calendar,
   Settings,
   LogOut,

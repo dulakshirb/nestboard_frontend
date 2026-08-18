@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { api } from "@/api/client"
-import type { Property, PropertyListResponse } from "@/types/property"
+import type { PropertyListResponse } from "@/types/property"
 
 export type PropertyFilters = {
   search?: string

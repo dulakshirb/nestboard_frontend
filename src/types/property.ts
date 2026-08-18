@@ -9,6 +9,8 @@ export type Property = {
   isFavorite: boolean
   isActive: boolean
   image: string
+  lat?: number
+  lng?: number
 }
 
 export type PropertyListResponse = {
@@ -31,7 +33,7 @@ export type PropertyDetail = {
   address: string
   city: string
   type: string
-  rating: string
+  rating: number
   isFavorite: boolean
   amenities: string[]
   latitude: number

@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Bell, CheckCheck, CalendarCheck, XCircle, Clock } from "lucide-react"
 import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from "@/api/notifications"
-import type { Notification, NotificationType } from "@/types/notification"
+import type { NotificationType } from "@/types/notification"
 
 const TYPE_CONFIG: Record<
   NotificationType,

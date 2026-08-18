@@ -10,7 +10,7 @@ export function AdminSettings() {
 
   const [displayName, setDisplayName] = useState(user?.displayName ?? "")
   const [email, setEmail] = useState(user?.email ?? "")
-  const [phone, setPhone] = useState(user?.phone ?? "")
+  const [phone, setPhone] = useState("")
 
   const updateProfile = useMutation({
     mutationFn: (data: { displayName: string; email: string; phone: string }) =>

@@ -28,8 +28,7 @@ export function AdminPropertyManage() {
   const { id: propertyId } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
 
-  const { data: properties } = useMyProperties()
-  const property = properties?.find((p) => p.id === propertyId)
+  const { data: _properties } = useMyProperties()
 
   const { data: roomTypes, isLoading } = useQuery({
     queryKey: ["roomTypes", propertyId],
