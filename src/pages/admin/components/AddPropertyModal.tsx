@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Loader2, X } from "lucide-react"
-import { useState, type FormEvent } from "react"
+import { Camera, Loader2, X } from "lucide-react"
+import { useRef, useState, useEffect, type FormEvent } from "react"
 import { createProperty } from "@/api/properties"
+import { uploadFile } from "@/api/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { CreatePropertyInput } from "@/types/property"
@@ -29,6 +30,18 @@ export function AddPropertyModal({ open, onOpenChange }: Props) {
   const [form, setForm] = useState<CreatePropertyInput>(initial)
   const [amenitiesText, setAmenitiesText] = useState("")
   const [error, setError] = useState("")
+  const [preview, setPreview] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onOpenChange(false)
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [open, onOpenChange])
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -42,6 +55,7 @@ export function AddPropertyModal({ open, onOpenChange }: Props) {
     onSuccess: () => {
       setForm(initial)
       setAmenitiesText("")
+      setPreview(null)
       onOpenChange(false)
       void queryClient.invalidateQueries({ queryKey: ["myProperties"] })
     },
@@ -51,14 +65,35 @@ export function AddPropertyModal({ open, onOpenChange }: Props) {
 
   if (!open) return null
 
+  function handleBackdrop(e: React.MouseEvent) {
+    if (e.target === e.currentTarget) onOpenChange(false)
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError("")
     mutation.mutate()
   }
 
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setError("")
+    setUploading(true)
+    try {
+      setPreview(URL.createObjectURL(file))
+      const { url } = await uploadFile(file)
+      setForm((prev) => ({ ...prev, imageUrl: url }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Image upload failed")
+      setPreview(null)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={handleBackdrop}>
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">Add New Property</h2>
@@ -137,17 +172,36 @@ export function AddPropertyModal({ open, onOpenChange }: Props) {
                 <option value="HOTEL">Hotel</option>
               </select>
             </label>
-            <label className="block text-sm font-medium text-gray-700">
-              Image URL
-              <Input
-                required
-                type="url"
-                value={form.imageUrl}
-                onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                className="mt-1"
-                placeholder="https://..."
+            <div className="block text-sm font-medium text-gray-700">
+              Cover Image
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileChange}
+                className="hidden"
               />
-            </label>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="mt-1 flex h-9 w-full items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-500 hover:bg-gray-100"
+              >
+                {uploading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Camera className="h-4 w-4" />
+                )}
+                {uploading ? "Uploading..." : preview ? "Change image" : "Pick an image"}
+              </button>
+              {preview && form.imageUrl && (
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="mt-2 h-32 w-full rounded-md object-cover"
+                />
+              )}
+            </div>
           </div>
 
           <label className="block text-sm font-medium text-gray-700">
@@ -204,8 +258,8 @@ export function AddPropertyModal({ open, onOpenChange }: Props) {
             </p>
           )}
 
-          <Button type="submit" disabled={mutation.isPending} className="w-full">
-            {mutation.isPending && <Loader2 className="animate-spin" />}
+          <Button type="submit" disabled={mutation.isPending || uploading || !form.imageUrl} className="w-full">
+            {(mutation.isPending || uploading) && <Loader2 className="animate-spin" />}
             {mutation.isPending ? "Creating..." : "Create Property"}
           </Button>
         </form>

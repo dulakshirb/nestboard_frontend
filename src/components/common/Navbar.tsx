@@ -1,7 +1,9 @@
-import { Building2, Heart, LogOut, Menu, MessageCircle, X } from "lucide-react"
+import { Building2, Heart, LogOut, Menu, Bell, X } from "lucide-react"
 import { useState } from "react"
 import { NavLink, useNavigate } from "react-router"
 import { useAuthStore } from "@/stores/authStore"
+import { useQuery } from "@tanstack/react-query"
+import { fetchUnreadCount } from "@/api/notifications"
 
 export type NavbarLink = {
   label: string
@@ -30,6 +32,13 @@ export function Navbar({ links }: NavbarProps) {
   const isSignedIn = status === "signedIn"
   const isAdmin = user?.role === "ADMIN"
 
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["notifications-unread"],
+    queryFn: fetchUnreadCount,
+    enabled: isSignedIn,
+    refetchInterval: 30000,
+  })
+
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
       "text-md rounded-full px-4 py-1.5 transition-all duration-200",
@@ -45,7 +54,7 @@ export function Navbar({ links }: NavbarProps) {
   return (
     <div className="absolute top-0 right-0 left-0 z-50 px-4 pt-4">
       <nav
-        className={`flex items-center justify-between rounded-full px-5 py-3 ${isAdmin ? "bg-blue-500/50" : "bg-orange-500/50"
+        className={`flex items-center justify-between rounded-full px-5 py-3 ${isAdmin ? "bg-blue-500/50" : "bg-primary/50"
           }`}
       >
         {/* Logo */}
@@ -74,11 +83,22 @@ export function Navbar({ links }: NavbarProps) {
 
         {/* Right section */}
         <div className="flex items-center gap-2 sm:gap-3.5">
-          <button className="hidden rounded-full p-2 transition-colors hover:bg-white/10 sm:block">
+          <button
+            onClick={() => navigate("/saved")}
+            className="hidden rounded-full p-2 transition-colors hover:bg-white/10 sm:block"
+          >
             <Heart className="h-5 w-5 text-white/70 hover:text-white" />
           </button>
-          <button className="hidden rounded-full p-2 transition-colors hover:bg-white/10 sm:block">
-            <MessageCircle className="h-5 w-5 text-white/70 hover:text-white" />
+          <button
+            onClick={() => navigate("/notifications")}
+            className="relative hidden rounded-full p-2 transition-colors hover:bg-white/10 sm:block"
+          >
+            <Bell className="h-5 w-5 text-white/70 hover:text-white" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </button>
 
           {!isSignedIn ? (
@@ -91,9 +111,9 @@ export function Navbar({ links }: NavbarProps) {
           ) : (
             <>
               <button
-                onClick={() => navigate("/dashboard")}
-                title="Dashboard"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-semibold text-gray-800"
+                onClick={() => navigate("/profile")}
+                title="Profile"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F7C948] text-sm font-semibold text-white"
               >
                 {user ? initials(user.displayName) : "?"}
               </button>
@@ -142,6 +162,22 @@ export function Navbar({ links }: NavbarProps) {
               {label}
             </NavLink>
           ))}
+          {isSignedIn && (
+            <NavLink
+              to="/profile"
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                [
+                  "block rounded-xl px-4 py-2.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-700 hover:bg-gray-50",
+                ].join(" ")
+              }
+            >
+              Profile
+            </NavLink>
+          )}
           {isAdmin && (
             <NavLink
               to="/admin"

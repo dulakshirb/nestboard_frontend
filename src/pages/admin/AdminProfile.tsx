@@ -30,7 +30,7 @@ export function AdminProfile() {
   }
 
   return (
-    <div>
+    <div className="p-7">
       <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
       <p className="mt-1 text-sm text-gray-500">
         Update your public profile information.

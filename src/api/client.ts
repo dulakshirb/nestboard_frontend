@@ -61,6 +61,24 @@ export function clearTokens(): void {
   localStorage.removeItem(REFRESH_KEY)
 }
 
+export async function uploadFile(file: File): Promise<{ url: string }> {
+  const formData = new FormData()
+  formData.append("image", file)
+
+  const headers: Record<string, string> = {}
+  const token = localStorage.getItem(ACCESS_KEY)
+  if (token) headers.Authorization = `Bearer ${token}`
+
+  const res = await fetch(`${BASE_URL}/uploads/cover-image`, {
+    method: "POST",
+    headers,
+    body: formData,
+  })
+
+  if (!res.ok) throw await parseError(res)
+  return (await res.json()) as { url: string }
+}
+
 export async function api<T>(
   path: string,
   options: ApiOptions = {},

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useLocation } from "react-router"
-import { confirmBooking } from "@/api/bookings"
+import { confirmBooking, cancelBooking } from "@/api/bookings"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -29,6 +29,11 @@ export function MyBookings() {
   const queryClient = useQueryClient()
   const confirmMutation = useMutation({
     mutationFn: confirmBooking,
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["myBookings"] }),
+  })
+  const cancelMutation = useMutation({
+    mutationFn: cancelBooking,
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["myBookings"] }),
   })
@@ -102,13 +107,23 @@ export function MyBookings() {
               </div>
 
               {booking.bookingStatus === "PENDING" && (
-                <Button
-                  onClick={() => confirmMutation.mutate(booking.id)}
-                  disabled={confirmMutation.isPending}
-                  className="mt-4 w-full rounded-xl font-semibold cursor-pointer"
-                >
-                  Pay & Confirm
-                </Button>
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    onClick={() => confirmMutation.mutate(booking.id)}
+                    disabled={confirmMutation.isPending}
+                    className="flex-1 rounded-xl font-semibold cursor-pointer"
+                  >
+                    Pay & Confirm
+                  </Button>
+                  <Button
+                    onClick={() => cancelMutation.mutate(booking.id)}
+                    disabled={cancelMutation.isPending}
+                    variant="outline"
+                    className="rounded-xl font-semibold cursor-pointer"
+                  >
+                    Cancel
+                  </Button>
+                </div>
               )}
             </Card>
           ))}

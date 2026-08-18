@@ -1,8 +1,8 @@
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query"
-import { MapPin, Plus } from "lucide-react"
+import { MapPin, Plus, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { Link } from "react-router"
-import { fetchRoomTypes, setPropertyActive } from "@/api/properties"
+import { deleteProperty, fetchRoomTypes, setPropertyActive } from "@/api/properties"
 import { Button } from "@/components/ui/button"
 import { useMyProperties } from "@/hooks/useMyProperties"
 import { AddPropertyModal } from "./components/AddPropertyModal"
@@ -23,13 +23,14 @@ export function AdminProperties() {
       queryKey: ["adminRoomTypes", id],
       queryFn: () => fetchRoomTypes(id),
       enabled: propertyIds.length > 0,
-      staleTime: 60_000,
+      staleTime: 5_000,
+      refetchInterval:10_000,
     })),
   })
 
   const stats = useMemo(
     () =>
-      propertyIds.map((id, i) => {
+      propertyIds.map((_id, i) => {
         const rts = roomTypeQueries[i]?.data ?? []
         const seats = rts.reduce((s, rt) => s + rt.seatCapacity, 0)
         const free = rts.reduce((s, rt) => s + rt.freeSeats, 0)
@@ -48,15 +49,18 @@ export function AdminProperties() {
       void queryClient.invalidateQueries({ queryKey: ["myProperties"] }),
   })
 
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteProperty(id),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({ queryKey: ["myProperties"] }),
+  })
+
   return (
-    <div>
+    <div className="p-7">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Properties</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {properties?.length ?? 0} properties in total
-          </p>
-        </div>
+        <p className="text-sm text-gray-500">
+          {properties?.length ?? 0} properties in total
+        </p>
         <Button onClick={() => setModalOpen(true)}>
           <Plus />
           Add Property
@@ -119,7 +123,20 @@ export function AdminProperties() {
                       {p.isActive ? "Deactivate" : "Activate"}
                     </Button>
                     <Button size="sm" variant="outline" className="flex-1" asChild>
-                      <Link to={`/property-details/${p.id}`}>Manage</Link>
+                       <Link to={`/admin/properties/${p.id}`}>Manage</Link>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                      disabled={remove.isPending}
+                      onClick={() => {
+                        if (window.confirm(`Delete "${p.title}"? This cannot be undone.`)) {
+                          remove.mutate(p.id)
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

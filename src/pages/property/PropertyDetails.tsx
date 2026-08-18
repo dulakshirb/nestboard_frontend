@@ -2,6 +2,7 @@ import { useParams } from "react-router"
 import { PropertySection } from "./components/PropertySection"
 import { PropertyInfo } from "./components/PropertyInfo"
 import { RoomList } from "./components/RoomList"
+import { ReviewsSection } from "./components/ReviewsSection"
 import { usePropertyDetail } from "@/hooks/usePropertyDetail"
 import { useRoomTypes } from "@/hooks/useRoomTypes"
 
@@ -55,6 +56,8 @@ export function PropertyDetails() {
             propertyId={property.id}
           />
         </div>
+
+        <ReviewsSection propertyId={property.id} />
       </div>
     </div>
   )
