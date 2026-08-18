@@ -1,33 +1,43 @@
-//import { useState } from "react"
 import { HeroSection } from "./components/HeroSection"
 import { PropertyList } from "./components/PropertyList"
 import { SearchFilters } from "./components/SearchFilters"
-import type { Property } from "@/types/property"
-import { useProperties } from "@/hooks/useProperties"
-import { useUIStore } from "@/stores/uiStore"
+import { usePropertyList } from "@/hooks/usePropertyList"
+import { useSearchParams } from "react-router"
+import { useCallback, useRef } from "react"
 
 export function Home() {
-  // const [searchQuery, setSearchQuery] = useState("")
-  // const [activeCategory, setActiveCategory] = useState<
-  //   Property["type"] | "All"
-  // >("All")
-  const searchQuery = useUIStore((state) => state.searchQuery)
-  const activeCategory = useUIStore((state) => state.activeCategory)
-  const { data: properties = [], isLoading, isError } = useProperties()
-  const filterBySearch = (property: Property) => {
-    return (
-      searchQuery === "" ||
-      property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      property.location.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }
+  const [searchParams] = useSearchParams()
 
-  const filterByCategory = (property: Property) => {
-    return activeCategory === "All" || property.type === activeCategory
-  }
+  const search = searchParams.get("search") ?? ""
+  const type = searchParams.get("type") ?? "All"
+  const city = searchParams.get("city") ?? ""
+  const sort = searchParams.get("sort") ?? "newest"
 
-  const filteredProperties = properties.filter(
-    (property) => filterBySearch(property) && filterByCategory(property)
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = usePropertyList({ search, type, city, sort })
+
+  const properties = data?.properties ?? []
+  const total = data?.total ?? 0
+
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const lastElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage) return
+      if (observerRef.current) observerRef.current.disconnect()
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          void fetchNextPage()
+        }
+      })
+      if (node) observerRef.current.observe(node)
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage],
   )
 
   return (
@@ -35,19 +45,20 @@ export function Home() {
       <HeroSection />
       <SearchFilters />
 
-      {/* <SearchFilters
-        searchQuery={searchQuery}
-        activeCategory={activeCategory}
-        onSearchChange={setSearchQuery}
-        onCategoryChange={setActiveCategory}
-      /> */}
       {isError && (
         <div className="px-8 py-10 text-red-400">
           Failed to load properties. Please try again.
         </div>
       )}
       {!isLoading && !isError && (
-        <PropertyList properties={filteredProperties} />
+        <PropertyList
+          properties={properties}
+          total={total}
+          lastElementRef={lastElementRef}
+          isFetchingNextPage={isFetchingNextPage}
+          isLoading={isLoading}
+          hasNextPage={hasNextPage}
+        />
       )}
     </>
   )

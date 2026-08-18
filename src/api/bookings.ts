@@ -9,6 +9,10 @@ export function confirmBooking(id: string): Promise<Booking> {
   return api<Booking>(`/bookings/${id}/confirm`, { method: "POST" })
 }
 
+export function cancelBooking(id: string): Promise<Booking> {
+  return api<Booking>(`/bookings/${id}/cancel`, { method: "POST" })
+}
+
 export function fetchMyBookings(): Promise<Booking[]> {
   return api<Booking[]>("/bookings/my")
 }

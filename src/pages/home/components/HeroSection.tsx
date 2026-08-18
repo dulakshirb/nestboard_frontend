@@ -9,8 +9,8 @@ export function HeroSection() {
         backgroundPosition: 'center',
       }}
     >
-      {/* Dark overlay */}
-      <div className="z-10 absolute inset-0 bg-black/55" />
+      {/* Dark gradient overlay */}
+      <div className="z-10 absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
       <div className="z-20 flex flex-col items-center">
         {/* Country badge */}
         <div className="mt-20 mb-5 inline-flex items-center gap-1.5 px-3 py-1 text-sm text-white/90">

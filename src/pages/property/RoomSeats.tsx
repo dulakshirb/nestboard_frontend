@@ -30,6 +30,8 @@ export function RoomSeats() {
   const navigate = useNavigate()
   const location = useLocation()
   const status = useAuthStore((state) => state.status)
+  const user = useAuthStore((state) => state.user)
+  const isAdmin = user?.role === "ADMIN"
   const [selected, setSelected] = useState<SelectedSeat | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -104,7 +106,7 @@ export function RoomSeats() {
                     variant="outline"
                     className="rounded-full text-xs text-gray-500"
                   >
-                    {data.maxSeatsCount} seats
+                    {data.seatCapacity} seats
                   </Badge>
                 </div>
 
@@ -161,16 +163,22 @@ export function RoomSeats() {
           })}
         </div>
 
-        <Button
-          onClick={handleBook}
-          disabled={!selected}
-          className="mt-8 w-full rounded-xl font-semibold cursor-pointer"
-          size="lg"
-        >
-          {selected
-            ? `Book seat ${selected.seatNumber} (${selected.roomName})`
-            : "Select a seat"}
-        </Button>
+        {isAdmin ? (
+          <div className="mt-8 rounded-xl border border-blue-200 bg-blue-50 p-4 text-center text-sm text-blue-700">
+            You are viewing this as a property manager. Tenants can book seats from this page.
+          </div>
+        ) : (
+          <Button
+            onClick={handleBook}
+            disabled={!selected}
+            className="mt-8 w-full rounded-xl font-semibold cursor-pointer"
+            size="lg"
+          >
+            {selected
+              ? `Book seat ${selected.seatNumber} (${selected.roomName})`
+              : "Select a seat"}
+          </Button>
+        )}
       </div>
 
       {modalOpen && selected && (

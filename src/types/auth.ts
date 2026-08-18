@@ -7,6 +7,7 @@ export type User = {
   role: Role
   avatarUrl: string | null
   bioTag: string | null
+  createdAt: string | null
 }
 
 export type AuthResponse = {

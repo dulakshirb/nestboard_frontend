@@ -1,10 +1,36 @@
-import { Star } from "lucide-react"
+import { Heart, Star } from "lucide-react"
 import { Badge } from "../ui/badge"
 import { Card } from "../ui/card"
 import type { Property } from "@/types/property"
 import { Link } from "react-router"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { toggleFavorite } from "@/api/properties"
+import { useAuthStore } from "@/stores/authStore"
+import { useNavigate } from "react-router"
 
 export function PropertyCard(props: Property) {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+
+  const favMutation = useMutation({
+    mutationFn: () => toggleFavorite(props.id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["properties"] })
+      void queryClient.invalidateQueries({ queryKey: ["favorites"] })
+    },
+  })
+
+  function handleFav(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!user) {
+      navigate(`/sign-in?redirect=${encodeURIComponent(window.location.pathname)}`)
+      return
+    }
+    favMutation.mutate()
+  }
+
   return (
     <Link to={`/property-details/${props.id}`} className="block">
       <Card
@@ -14,11 +40,22 @@ export function PropertyCard(props: Property) {
         {/* Background image */}
         <img
           src={props.image}
-          alt={"title"}
+          alt={props.title}
           className="absolute inset-0 h-full w-full object-cover"
         />
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/20 to-transparent" />
+
+        {/* Favourite button */}
+        <button
+          onClick={handleFav}
+          className="absolute top-2.5 left-2.5 z-10 rounded-full bg-black/30 p-1.5 backdrop-blur-sm transition-colors hover:bg-black/50"
+        >
+          <Heart
+            className={`size-4 ${props.isFavorite ? "fill-red-500 text-red-500" : "text-white/70"}`}
+          />
+        </button>
+
         {/* Rating badge */}
         <Badge className="absolute top-2.5 right-2.5 h-auto gap-1 border-0 bg-white/90 py-0.5 text-gray-800 backdrop-blur-sm">
           <Star className="size-3 fill-yellow-400 text-yellow-400" />

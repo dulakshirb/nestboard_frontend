@@ -25,14 +25,11 @@ export function AdminBookings() {
   )
 
   return (
-    <div>
+    <div className="p-7">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Bookings</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Showing {filtered.length} of {bookings?.length ?? 0} bookings
-          </p>
-        </div>
+        <p className="text-sm text-gray-500">
+          Showing {filtered.length} of {bookings?.length ?? 0} bookings
+        </p>
         <div className="flex gap-2">
           <select
             value={status}
@@ -60,50 +57,70 @@ export function AdminBookings() {
       </div>
 
       <div className="mt-6 overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
-        <table className="w-full min-w-205 text-left text-sm">
-          <thead>
-            <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-400 uppercase">
-              <th className="px-5 py-3.5 font-medium">Booking ID</th>
-              <th className="px-5 py-3.5 font-medium">Property</th>
-              <th className="px-5 py-3.5 font-medium">Room</th>
-              <th className="px-5 py-3.5 font-medium">Seat</th>
-              <th className="px-5 py-3.5 font-medium">Tenant</th>
-              <th className="px-5 py-3.5 font-medium">Duration</th>
-              <th className="px-5 py-3.5 font-medium">Amount</th>
-              <th className="px-5 py-3.5 font-medium">Payment</th>
-              <th className="px-5 py-3.5 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((b) => (
-              <tr key={b.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
-                <td className="px-5 py-3.5 font-mono text-xs text-gray-500">
-                  bk-{b.id.slice(-8)}
-                </td>
-                <td className="px-5 py-3.5 font-medium text-gray-900">
-                  {b.room.roomType.property.title}
-                </td>
-                <td className="px-5 py-3.5 text-gray-600">{b.room.roomLabel}</td>
-                <td className="px-5 py-3.5 text-gray-600">{b.seatNumber}</td>
-                <td className="px-5 py-3.5 text-gray-600">{b.tenant.displayName}</td>
-                <td className="px-5 py-3.5 text-gray-600">{b.durationMonths} mo</td>
-                <td className="px-5 py-3.5 font-medium text-gray-900">
-                  LKR {Number(b.totalAmount).toLocaleString()}
-                </td>
-                <td className="px-5 py-3.5">
-                  <StatusPill status={b.paymentStatus} />
-                </td>
-                <td className="px-5 py-3.5">
-                  <StatusPill status={b.bookingStatus} />
-                </td>
-              </tr>
+        {isLoading ? (
+          <div className="p-6 space-y-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex animate-pulse gap-4">
+                <div className="h-4 w-24 rounded bg-gray-200" />
+                <div className="h-4 w-32 rounded bg-gray-200" />
+                <div className="h-4 w-20 rounded bg-gray-200" />
+                <div className="h-4 w-16 rounded bg-gray-200" />
+                <div className="h-4 w-24 rounded bg-gray-200" />
+                <div className="h-4 w-12 rounded bg-gray-200" />
+                <div className="h-4 w-20 rounded bg-gray-200" />
+                <div className="h-4 w-16 rounded bg-gray-200" />
+                <div className="h-4 w-20 rounded bg-gray-200" />
+              </div>
             ))}
-          </tbody>
-        </table>
-        {!isLoading && filtered.length === 0 && (
-          <p className="px-5 py-10 text-center text-sm text-gray-400">
-            No bookings match the selected filters.
-          </p>
+          </div>
+        ) : (
+          <>
+            <table className="w-full min-w-205 text-left text-sm">
+              <thead>
+                <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-400 uppercase">
+                  <th className="px-5 py-3.5 font-medium">Booking ID</th>
+                  <th className="px-5 py-3.5 font-medium">Property</th>
+                  <th className="px-5 py-3.5 font-medium">Room</th>
+                  <th className="px-5 py-3.5 font-medium">Seat</th>
+                  <th className="px-5 py-3.5 font-medium">Tenant</th>
+                  <th className="px-5 py-3.5 font-medium">Duration</th>
+                  <th className="px-5 py-3.5 font-medium">Amount</th>
+                  <th className="px-5 py-3.5 font-medium">Payment</th>
+                  <th className="px-5 py-3.5 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((b) => (
+                  <tr key={b.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
+                    <td className="px-5 py-3.5 font-mono text-xs text-gray-500">
+                      bk-{b.id.slice(-8)}
+                    </td>
+                    <td className="px-5 py-3.5 font-medium text-gray-900">
+                      {b.room.roomType.property.title}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-600">{b.room.roomLabel}</td>
+                    <td className="px-5 py-3.5 text-gray-600">{b.seatNumber}</td>
+                    <td className="px-5 py-3.5 text-gray-600">{b.tenant.displayName}</td>
+                    <td className="px-5 py-3.5 text-gray-600">{b.durationMonths} mo</td>
+                    <td className="px-5 py-3.5 font-medium text-gray-900">
+                      LKR {Number(b.totalAmount).toLocaleString()}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <StatusPill status={b.paymentStatus} />
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <StatusPill status={b.bookingStatus} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filtered.length === 0 && (
+              <p className="px-5 py-10 text-center text-sm text-gray-400">
+                No bookings match the selected filters.
+              </p>
+            )}
+          </>
         )}
       </div>
 

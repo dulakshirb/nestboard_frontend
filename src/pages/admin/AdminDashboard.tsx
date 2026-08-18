@@ -1,21 +1,11 @@
-import { Building2, DollarSign, House, Percent, TrendingUp } from "lucide-react"
+import { Building2, CalendarCheck, DollarSign, House, TrendingUp } from "lucide-react"
 import { useQueries } from "@tanstack/react-query"
 import { type ReactNode, useMemo } from "react"
 import { fetchRoomTypes } from "@/api/properties"
 
 import { useAuthStore } from "@/stores/authStore"
-import { StatusPill } from "./components/StatusPill"
 import { useMyProperties } from "@/hooks/useMyProperties"
 import { useAdminBookings } from "@/hooks/useAdminBookings"
-
-function formatTodayLong(): string {
-  return new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date())
-}
 
 function formatMoney(value: number): string {
   if (value >= 1_000_000) return `LKR ${(value / 1_000_000).toFixed(1)}M`
@@ -26,7 +16,7 @@ function formatMoney(value: number): string {
 type StatCardProps = {
   icon: ReactNode
   iconWrapClassName: string
-  trend: string
+  trend?: string
   value: string | null
   label: string
   timeframe: string
@@ -50,10 +40,12 @@ function StatCard({
         >
           {icon}
         </div>
-        <div className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
-          <TrendingUp className="h-3.5 w-3.5" aria-hidden />
-          {trend}
-        </div>
+        {trend && (
+          <div className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+            <TrendingUp className="h-3.5 w-3.5" aria-hidden />
+            {trend}
+          </div>
+        )}
       </div>
       <p className="mt-6 text-4xl font-bold tracking-tight text-gray-900 tabular-nums">
         {loading || value === null ? (
@@ -121,6 +113,11 @@ export function AdminDashboard() {
   )
   const occupancy = totalSeats > 0 ? Math.round(((totalSeats - freeSeats) / totalSeats) * 100) : 0
 
+  const activeBookings = useMemo(
+    () => (bookings ?? []).filter((b) => b.bookingStatus === "CONFIRMED").length,
+    [bookings],
+  )
+
   const revenue = useMemo(
     () =>
       (bookings ?? [])
@@ -145,39 +142,32 @@ export function AdminDashboard() {
   )
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-        Hello, {user?.displayName ?? "there"}
-      </h1>
-      <p className="mt-2 text-base text-gray-500">{formatTodayLong()}</p>
-
-      <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="p-7">
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           icon={<Building2 className="h-5 w-5 text-teal-600" />}
           iconWrapClassName="bg-teal-100"
-          trend="+1"
+          trend="+2%"
           value={propsLoading ? null : String(totalProperties ?? 0)}
           label="Total Properties"
-          timeframe="this quarter"
+          timeframe="Managed properties"
           loading={propsLoading}
         />
         <StatCard
           icon={<House className="h-5 w-5 text-purple-600" />}
           iconWrapClassName="bg-purple-100"
-          trend="+4"
           value={totalRooms === null ? null : String(totalRooms)}
           label="Total Rooms"
-          timeframe="from last month"
+          timeframe="From all properties"
           loading={propsLoading || roomsLoading}
         />
         <StatCard
-          icon={<Percent className="h-5 w-5 text-blue-600" />}
+          icon={<CalendarCheck className="h-5 w-5 text-blue-600" />}
           iconWrapClassName="bg-blue-100"
-          trend="+3%"
-          value={roomsLoading ? null : `${occupancy}%`}
-          label="Occupancy"
-          timeframe="across all rooms"
-          loading={roomsLoading}
+          value={bookingsLoading ? null : String(activeBookings)}
+          label="Active Bookings"
+          timeframe="Currently active"
+          loading={bookingsLoading}
         />
         <StatCard
           icon={<DollarSign className="h-5 w-5 text-amber-600" />}
@@ -185,12 +175,12 @@ export function AdminDashboard() {
           trend="+12%"
           value={bookingsLoading ? null : formatMoney(revenue)}
           label="Monthly Revenue"
-          timeframe="from confirmed bookings"
+          timeframe="This month's earnings"
           loading={bookingsLoading}
         />
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-5">
+      <div className="mt-6 grid gap-6 lg:grid-cols-5">
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-3">
           <h2 className="text-lg font-semibold text-gray-900">Occupancy by Property</h2>
           <div className="mt-5 space-y-4">
@@ -226,14 +216,19 @@ export function AdminDashboard() {
                 className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 px-4 py-3"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-gray-900">
-                    {b.room.roomType.property.title}
-                  </p>
-                  <p className="text-xs text-gray-500">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-green-500" />
+                    <p className="truncate text-sm font-medium text-gray-900">
+                      {b.room.roomType.property.title}
+                    </p>
+                  </div>
+                  <p className="ml-4 mt-0.5 text-xs text-gray-500">
                     {b.room.roomLabel} · Seat {b.seatNumber} · {b.tenant.displayName}
                   </p>
                 </div>
-                <StatusPill status={b.bookingStatus} />
+                <span className="inline-flex shrink-0 items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700">
+                  {b.bookingStatus.charAt(0) + b.bookingStatus.slice(1).toLowerCase()}
+                </span>
               </div>
             ))}
             {bookings !== undefined && bookings.length === 0 && (

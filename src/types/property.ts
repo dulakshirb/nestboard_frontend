@@ -47,7 +47,6 @@ export type RoomType = {
   name: string
   pricePerMonth: string
   freeSeats: number
-  maxSeatsCount: number
   roomsCount: number
   seatCapacity: number
   hasAC: boolean
@@ -69,7 +68,7 @@ export type RoomTypeDetail = {
   id: string
   name: string
   pricePerMonth: string
-  maxSeatsCount: number
+  seatCapacity: number
   roomsCount: number
   hasAC: boolean
   rooms: RoomSeats[]
@@ -86,4 +85,23 @@ export type CreatePropertyInput = {
   longitude: number
   imageUrl: string
   minStay?: string
+}
+
+export type CreateRoomTypeInput = {
+  name: string
+  pricePerMonth: number
+  hasAC?: boolean
+  isAvailable?: boolean
+}
+
+export type CreateRoomInput = {
+  roomLabel: string
+  seatCapacity?: number
+  isAvailable?: boolean
+}
+
+export type UpdateRoomInput = {
+  roomLabel?: string
+  seatCapacity?: number
+  isAvailable?: boolean
 }
