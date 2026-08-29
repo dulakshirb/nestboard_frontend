@@ -15,8 +15,8 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useMyProperties } from "@/hooks/useMyProperties"
 import type { CreateRoomTypeInput } from "@/types/property"
+import { EditPropertyModal } from "./components/EditPropertyModal"
 
 const emptyRoomTypeForm: CreateRoomTypeInput = {
   name: "",
@@ -27,8 +27,6 @@ const emptyRoomTypeForm: CreateRoomTypeInput = {
 export function AdminPropertyManage() {
   const { id: propertyId } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
-
-  const { data: _properties } = useMyProperties()
 
   const { data: roomTypes, isLoading } = useQuery({
     queryKey: ["roomTypes", propertyId],
@@ -49,6 +47,7 @@ export function AdminPropertyManage() {
   const [editingRt, setEditingRt] = useState<string | null>(null)
   const [rtForm, setRtForm] = useState<CreateRoomTypeInput>(emptyRoomTypeForm)
   const [rtError, setRtError] = useState("")
+  const [editPropertyOpen, setEditPropertyOpen] = useState(false)
 
   const invalidateAll = () => {
     void queryClient.invalidateQueries({ queryKey: ["roomTypes", propertyId] })
@@ -184,7 +183,10 @@ export function AdminPropertyManage() {
           </p>
         </div>
         <div className="ml-auto">
-          <Button onClick={openAddRt}>
+          <Button variant="outline" size="sm" onClick={() => setEditPropertyOpen(true)}>
+            <Pencil className="mr-1 size-4" /> Edit Details
+          </Button>
+          <Button onClick={openAddRt} className="ml-2">
             <Plus className="mr-1 size-4" /> Add Room Type
           </Button>
         </div>
@@ -487,6 +489,12 @@ export function AdminPropertyManage() {
           </div>
         </div>
       )}
+
+      <EditPropertyModal
+        propertyId={propertyId ?? ""}
+        open={editPropertyOpen}
+        onOpenChange={setEditPropertyOpen}
+      />
     </div>
   )
 }

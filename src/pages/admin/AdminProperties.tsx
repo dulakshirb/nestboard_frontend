@@ -1,17 +1,19 @@
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query"
-import { MapPin, Plus, Trash2 } from "lucide-react"
+import { MapPin, Pencil, Plus, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { Link } from "react-router"
 import { deleteProperty, fetchRoomTypes, setPropertyActive } from "@/api/properties"
 import { Button } from "@/components/ui/button"
 import { useMyProperties } from "@/hooks/useMyProperties"
 import { AddPropertyModal } from "./components/AddPropertyModal"
+import { EditPropertyModal } from "./components/EditPropertyModal"
 import { StatusPill } from "./components/StatusPill"
 
 export function AdminProperties() {
   const queryClient = useQueryClient()
   const { data: properties, isLoading, isError } = useMyProperties()
   const [modalOpen, setModalOpen] = useState(false)
+  const [editingPropertyId, setEditingPropertyId] = useState<string | null>(null)
 
   const propertyIds = useMemo(
     () => properties?.map((p) => p.id) ?? [],
@@ -128,6 +130,14 @@ export function AdminProperties() {
                     <Button
                       size="sm"
                       variant="outline"
+                      title="Edit property details"
+                      onClick={() => setEditingPropertyId(p.id)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       className="text-red-600 hover:bg-red-50 hover:text-red-700"
                       disabled={remove.isPending}
                       onClick={() => {
@@ -147,6 +157,11 @@ export function AdminProperties() {
       )}
 
       <AddPropertyModal open={modalOpen} onOpenChange={setModalOpen} />
+      <EditPropertyModal
+        propertyId={editingPropertyId ?? ""}
+        open={!!editingPropertyId}
+        onOpenChange={(open) => !open && setEditingPropertyId(null)}
+      />
     </div>
   )
 }
