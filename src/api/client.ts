@@ -8,6 +8,7 @@ type ApiOptions = {
   auth?: boolean
 }
 
+// structured errors from API body
 export class ApiError extends Error {
   code: string
   status: number
@@ -79,6 +80,7 @@ export async function uploadFile(file: File): Promise<{ url: string }> {
   return (await res.json()) as { url: string }
 }
 
+// the master function
 export async function api<T>(
   path: string,
   options: ApiOptions = {},

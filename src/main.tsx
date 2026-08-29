@@ -6,7 +6,7 @@ import "./index.css"
 import App from "./App.tsx"
 import { ThemeProvider } from "@/components/theme-provider.tsx"
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient() // one shared TanStack cache
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
 
 createRoot(document.getElementById("root")!).render(

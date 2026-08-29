@@ -174,6 +174,16 @@ export function AddPropertyModal({ open, onOpenChange }: Props) {
             </label>
             <div className="block text-sm font-medium text-gray-700">
               Cover Image
+              <Input
+                type="url"
+                value={form.imageUrl}
+                onChange={(e) => {
+                  setForm({ ...form, imageUrl: e.target.value.trim() })
+                  setPreview(null)
+                }}
+                className="mt-1"
+                placeholder="https://example.com/image.jpg"
+              />
               <input
                 ref={fileRef}
                 type="file"
@@ -185,16 +195,16 @@ export function AddPropertyModal({ open, onOpenChange }: Props) {
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="mt-1 flex h-9 w-full items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-500 hover:bg-gray-100"
+                className="mt-2 flex h-9 w-full items-center justify-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-500 hover:bg-gray-100"
               >
                 {uploading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Camera className="h-4 w-4" />
                 )}
-                {uploading ? "Uploading..." : preview ? "Change image" : "Pick an image"}
+                {uploading ? "Uploading..." : "Upload instead"}
               </button>
-              {preview && form.imageUrl && (
+              {preview && (
                 <img
                   src={preview}
                   alt="Preview"
